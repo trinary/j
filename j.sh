@@ -32,7 +32,9 @@ j() {
   ' $jfile 2>/dev/null > $jfile.tmp
   mv -f $jfile.tmp $jfile
  elif [ "$1" = "" -o "$1" = "--l" ];then
-  shift
+   if [ "$1" = "--l" ];then
+     shift
+   fi
   awk -v q="$*" -F"|" '
    BEGIN { split(q,a," ") }
    { for( o in a ) $1 !~ a[o] && $1 = ""; if( $1 ) print $2 "\t" $1 }
