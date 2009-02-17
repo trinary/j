@@ -1,10 +1,9 @@
 # maintains a jump-list of directories you actually use
 # old directories eventually fall off the list
-# inspired by http://wiki.github.com/joelthelion/autojump
-# and something similar i had - but i could never get the dir list right.
+# Ported to zsh from http://github.com/rupa/j
 #
 # INSTALL:
-#   source into .bashrc under your '[-z "$PS1" ] || return' line
+#   source into .zshrc
 #   cd around for a while
 #
 # USE:
@@ -38,15 +37,6 @@ j() {
    BEGIN { split(q,a," ") }
    { for( o in a ) $1 !~ a[o] && $1 = ""; if( $1 ) print $2 "\t" $1 }
   ' $jfile 2>/dev/null | sort -n
- # for completion
- elif [ "$1" = "--complete" ];then
-  awk -v q="$3" -F"|" '
-   BEGIN { split(q,a," ") }
-   { for( o in a ) $1 !~ a[o] && $1 = ""; if( $1 ) print $1 }
-  ' $jfile 2>/dev/null
- # if we hit enter on a completion just go there
- elif [ "${1:0:1}" = "/" -a -d "$*" ]; then
-  cd "$*" 
  else
   # prefer case sensitive
   cd=$(awk -v q="$*" -F"|" '
@@ -64,7 +54,11 @@ j() {
   [ "$cd" ] && cd "$cd"
  fi
 }
-# prepend to PROMPT_COMMAND
-PROMPT_COMMAND='j --add "$(pwd -P)";'"$PROMPT_COMMAND"
-# bash completions for j
-complete -o dirnames -o filenames -C "j --complete" j
+
+function precmd()  { 
+    j --add "$(pwd -P)" 
+}
+
+# zsh completions for j
+compdef _files j
+
