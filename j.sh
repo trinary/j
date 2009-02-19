@@ -57,9 +57,11 @@ j() {
  fi
 }
 
-function precmd()  { 
+function j_precmd()  { 
     j --add "$(pwd -P)" 
 }
+
+precmd_functions+=(j_premd) # append our function
 
 # zsh completions for j
 compdef _files j
